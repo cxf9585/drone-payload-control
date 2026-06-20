@@ -1,0 +1,5 @@
+menuconfig MODULES_PAYLOAD_CONTROL_PX4
+	bool "payload_control_px4"
+	default n
+	---help---
+		Build the UAV payload control command module.

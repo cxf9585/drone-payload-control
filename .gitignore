@@ -1,0 +1,27 @@
+# --- General ---
+tmp/
+.vscode/
+__pycache__/
+*.pyc
+.DS_Store
+*.bin
+*.swp
+*.swo
+*~
+
+# --- PX4 built artifacts (in case of local builds) ---
+build/
+build_*/
+
+# --- IDE / OS ---
+.idea/
+*.iml
+*.user
+Thumbs.db
+
+# --- Python ---
+.venv/
+venv/
+env/
+*.egg-info/
+dist/

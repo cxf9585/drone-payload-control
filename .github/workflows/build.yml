@@ -1,0 +1,50 @@
+﻿name: Build PX4 Firmware (cuav_7-nano)
+
+on:
+  push:
+    branches: [ main, master ]
+    paths-ignore:
+      - "**.md"
+      - "CAD/**"
+      - "Documents/**"
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    container:
+      image: px4io/px4-dev-nuttx-jammy:latest
+
+    steps:
+      - name: Checkout (with submodules)
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          fetch-depth: 1
+
+      - name: Deploy custom payload_control_px4 module into PX4 source
+        run: |
+          if [ -d "PX4/patches/payload_control_px4" ]; then
+            cp -r PX4/patches/payload_control_px4 PX4/PX4-Autopilot/src/modules/payload_control_px4
+          fi
+          if [ -f "PX4/patches/default.px4board" ]; then
+            cp PX4/patches/default.px4board PX4/PX4-Autopilot/boards/cuav/7-nano/default.px4board
+          fi
+
+      - name: Initialize PX4 submodules
+        run: |
+          cd PX4/PX4-Autopilot
+          git submodule update --init --recursive --depth 1
+
+      - name: Build cuav_7-nano_default
+        run: |
+          cd PX4/PX4-Autopilot
+          make cuav_7-nano_default
+
+      - name: Upload .px4 firmware artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: cuav_7-nano_default-firmware
+          path: PX4/PX4-Autopilot/build/cuav_7-nano_default/*.px4
+          if-no-files-found: error
